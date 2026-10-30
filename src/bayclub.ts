@@ -157,7 +157,12 @@ async function scanPlayerType(
         break;
       }
     }
-    await page.waitForTimeout(200);
+    // Selecting a date updates the highlight immediately, but its availability
+    // request can finish later. Wait for the SPA's network to go idle before
+    // reading; otherwise a fast scan can mistake the empty loading state for
+    // a day with no courts.
+    await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => undefined);
+    await page.waitForTimeout(300);
     const hourItems = await page.locator("app-court-time-slot-item").evaluateAll((elements) =>
       elements.map((element) => ({
         text: (element.textContent ?? "").replace(/\s+/g, " ").trim(),
