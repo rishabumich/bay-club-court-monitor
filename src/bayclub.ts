@@ -103,7 +103,7 @@ async function openHourView(
   await buttonGroups.nth(0).locator(".btn").filter({ hasText: playerType }).click();
   await buttonGroups.nth(1).locator(".btn").filter({ hasText: "60 minutes" }).click();
   await page.getByText("NEXT", { exact: true }).click();
-  await page.locator(".slider-item").first().waitFor({ state: "visible" });
+  await page.locator(".slider-item.ng-star-inserted").first().waitFor({ state: "visible" });
   await page.getByText("HOUR VIEW", { exact: true }).filter({ visible: true }).first().click();
   await page.getByText(/Court:\s*Any/i).filter({ visible: true }).first().waitFor({ state: "visible" });
 }
@@ -122,7 +122,10 @@ async function scanPlayerType(
   if (!search.enabled) return { id, name, slots: [] };
 
   await openHourView(page, config, playerType);
-  const dateItems = page.locator(".slider-item");
+  // The carousel's previous/next arrow controls also use `.slider-item`.
+  // Angular adds `ng-star-inserted` only to the actual day tiles, so filtering
+  // here keeps index 0 aligned with Today and index 1 with tomorrow.
+  const dateItems = page.locator(".slider-item.ng-star-inserted");
   const dateCount = await dateItems.count();
   const slots: Slot[] = [];
 
@@ -133,14 +136,14 @@ async function scanPlayerType(
     } else if (!preset.daysOfWeek.includes(date.dayName)) {
       continue;
     }
-    // Bay Club renders Today as selected with `disabled no-events`. Other date
-    // tiles can also sit behind the slider's overlay, so invoke their own click
-    // handler and verify Angular marked the intended day selected before reading.
+    // Bay Club's carousel overlay intercepts ordinary clicks. A forced pointer
+    // click still reaches its gesture handler; verify Angular selected the
+    // intended day before reading any hours.
     if (index > 0) {
       const dateItem = dateItems.nth(index);
       const initialClasses = (await dateItem.getAttribute("class")) ?? "";
       if (/\b(disabled|no-events)\b/.test(initialClasses)) continue;
-      await dateItem.evaluate((element) => (element as HTMLElement).click());
+      await dateItem.click({ force: true });
       let selected = false;
       for (let attempt = 0; attempt < 20; attempt += 1) {
         if ((await dateItem.getAttribute("class"))?.includes("day-selected")) {
