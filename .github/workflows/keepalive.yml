@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # A real repository commit every month prevents GitHub's 60-day inactivity
-    # rule from disabling the five-minute court-monitor schedule.
+    # rule from disabling the randomized daytime court-monitor schedule.
     - cron: "27 16 17 * *"
 
 permissions:

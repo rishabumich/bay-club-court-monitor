@@ -1,6 +1,6 @@
 # Bay Club Santa Clara tennis monitor
 
-A read-only monitor that checks Bay Club Connect every five minutes and sends a free Telegram alert when a matching 60-minute tennis opening appears. It never books, holds, changes, or cancels a reservation.
+A read-only monitor that checks Bay Club Connect and sends a free Telegram alert when a matching 60-minute tennis opening appears. It never books, holds, changes, or cancels a reservation.
 
 ## Your saved preferences
 
@@ -9,7 +9,7 @@ A read-only monitor that checks Bay Club Connect every five minutes and sends a 
 - Singles: 60 minutes, starting at 5:00 PM or later
 - Ball machine: 60 minutes, either 8:00–9:00 AM or starting at 5:00 PM or later
 - Alert channel: Telegram
-- Check interval: every five minutes
+- Hosted check interval: randomized between 5 and 15 minutes, from 7:00 AM to 11:00 PM Pacific
 - Search view: Bay Club's Hour View
 
 The scanner ignores every hour that has Bay Club's blue lock icon or disabled styling. That prevents alerts for dates or times outside your membership's three-day booking window.
@@ -31,7 +31,7 @@ Bay Club login is normally a one-time setup, but the website can expire its sess
 
 When this runs locally, monitoring pauses when the Mac sleeps, shuts down, loses its network connection, or the monitor's Terminal window is closed. A free hosted deployment can avoid that; it needs the same authenticated Bay Club session and persistent private storage.
 
-For the prepared free GitHub Actions deployment, see `CLOUD-DEPLOYMENT.md`. The five-minute monitor, monthly repository keepalive, and encrypted-session export command are included in this project.
+For the prepared free GitHub Actions deployment, see `CLOUD-DEPLOYMENT.md`. The randomized daytime monitor, monthly repository keepalive, and encrypted-session export command are included in this project.
 
 ## What an alert looks like
 

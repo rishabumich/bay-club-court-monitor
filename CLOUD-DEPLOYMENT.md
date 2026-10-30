@@ -20,7 +20,7 @@ It writes the value to `data/browser-profile/storage-state.base64.txt`. That ent
 
 ## Workflow behavior
 
-- `.github/workflows/monitor.yml` checks every five minutes and also supports **Run workflow** from GitHub's Actions page.
+- `.github/workflows/monitor.yml` starts a scheduled job every 10 minutes from 7:00 AM through 10:50 PM Pacific. Each job waits a random 0-5 minutes immediately before scanning, so consecutive Bay Club checks are intended to land 5-15 minutes apart and always before 11:00 PM. Manual **Run workflow** checks start immediately.
 - `.github/workflows/keepalive.yml` makes one timestamp-only bot commit each month so GitHub's 60-day public-repository inactivity rule does not disable scheduled checks.
 - It restores and saves `data/state.json` through the Actions cache so continuously available hours do not repeatedly alert.
 - Bay Club session data exists only in an encrypted secret and an ephemeral job environment. It is never cached or committed.

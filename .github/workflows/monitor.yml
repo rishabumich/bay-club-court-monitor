@@ -3,8 +3,11 @@ name: Check Bay Club courts
 on:
   workflow_dispatch:
   schedule:
-    # Offset from the top of the hour to reduce GitHub scheduler congestion.
-    - cron: "2/5 * * * *"
+    # Start a job every 10 minutes from 7:00 AM through 10:50 PM Pacific.
+    # A randomized 0-5 minute delay below makes the intended checks land
+    # 5-15 minutes apart while keeping every check before 11:00 PM.
+    - cron: "*/10 7-22 * * *"
+      timezone: "America/Los_Angeles"
 
 permissions:
   contents: read
@@ -45,6 +48,14 @@ jobs:
 
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+
+      - name: Randomize scheduled check time
+        if: github.event_name == 'schedule'
+        shell: bash
+        run: |
+          delay_seconds=$((RANDOM % 301))
+          echo "Waiting ${delay_seconds} seconds before checking Bay Club."
+          sleep "${delay_seconds}"
 
       - name: Check availability and notify Telegram
         run: npm run monitor:once -- --config config.example.json
