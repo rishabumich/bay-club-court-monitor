@@ -25,6 +25,8 @@ It writes the value to `data/browser-profile/storage-state.base64.txt`. That ent
 - It restores and saves `data/state.json` through the Actions cache so continuously available hours do not repeatedly alert.
 - Bay Club session data exists only in an encrypted secret and an ephemeral job environment. It is never cached or committed.
 - The workflow uses `config.example.json`, which contains only non-secret Santa Clara search preferences.
+- A separate 7:05 AM Pacific scheduled scan sends one Telegram health heartbeat after the scan succeeds.
+- If any workflow step fails, a final fallback step attempts to send a Telegram warning with a link to the failed run. If Telegram itself is unavailable or its credentials are invalid, rely on GitHub Actions failure notifications instead.
 
 ## When the Bay Club session expires
 

@@ -33,6 +33,8 @@ When this runs locally, monitoring pauses when the Mac sleeps, shuts down, loses
 
 For the prepared free GitHub Actions deployment, see `CLOUD-DEPLOYMENT.md`. The randomized daytime monitor, monthly repository keepalive, and encrypted-session export command are included in this project.
 
+The hosted workflow sends one Telegram health message after its successful 7:05 AM Pacific scan each day. If a workflow step fails, it also attempts to send a Telegram warning with a link to the failed GitHub Actions run. A Telegram outage or invalid Telegram credentials cannot be reported through Telegram itself, so GitHub Actions failure notifications remain the backup for that case.
+
 ## What an alert looks like
 
 Alerts use a compact hour view:

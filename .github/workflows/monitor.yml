@@ -8,6 +8,9 @@ on:
     # 5-15 minutes apart while keeping every check before 11:00 PM.
     - cron: "*/10 7-22 * * *"
       timezone: "America/Los_Angeles"
+    # A successful scan on this schedule sends the daily health heartbeat.
+    - cron: "5 7 * * *"
+      timezone: "America/Los_Angeles"
 
 permissions:
   contents: read
@@ -60,9 +63,17 @@ jobs:
       - name: Check availability and notify Telegram
         run: npm run monitor:once -- --config config.example.json
 
+      - name: Send daily health heartbeat
+        if: github.event_name == 'schedule' && github.event.schedule == '5 7 * * *'
+        run: node .github/scripts/telegram-status.mjs heartbeat
+
       - name: Save alert history
         if: always()
         uses: actions/cache/save@v4
         with:
           path: data/state.json
           key: monitor-state-${{ github.run_id }}
+
+      - name: Warn on monitor failure
+        if: failure()
+        run: node .github/scripts/telegram-status.mjs failure
