@@ -1,0 +1,31 @@
+{
+  "name": "bay-club-tennis-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Read-only Bay Club tennis court availability monitor with Telegram alerts",
+  "scripts": {
+    "setup:login": "tsx src/cli.ts setup-login",
+    "setup:telegram": "tsx src/cli.ts setup-telegram",
+    "cloud:export-session": "tsx src/cli.ts export-cloud-session",
+    "test:telegram": "tsx src/cli.ts test-telegram",
+    "inspect": "tsx src/cli.ts inspect",
+    "monitor:once": "tsx src/cli.ts monitor-once",
+    "monitor": "tsx src/cli.ts monitor",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "playwright": "^1.52.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

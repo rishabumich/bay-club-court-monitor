@@ -1,0 +1,57 @@
+name: Check Bay Club courts
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Offset from the top of the hour to reduce GitHub scheduler congestion.
+    - cron: "2/5 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bay-club-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NOTIFICATION_CHANNEL: telegram
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      BAYCLUB_STORAGE_STATE_B64: ${{ secrets.BAYCLUB_STORAGE_STATE_B64 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Restore Playwright browser cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore alert history
+        uses: actions/cache/restore@v4
+        with:
+          path: data/state.json
+          key: monitor-state-${{ github.run_id }}
+          restore-keys: monitor-state-
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Check availability and notify Telegram
+        run: npm run monitor:once -- --config config.example.json
+
+      - name: Save alert history
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/state.json
+          key: monitor-state-${{ github.run_id }}

@@ -1,0 +1,35 @@
+{
+  "browser": {
+    "loginUrl": "https://bayclubconnect.com/account/login/connect?returnUrl=%2Fhome%2Fdashboard",
+    "profileDir": "./data/browser-profile",
+    "headless": true,
+    "navigationTimeoutMs": 30000
+  },
+  "pollIntervalSeconds": 300,
+  "notificationCooldownMinutes": 720,
+  "safety": {
+    "blockedActionTextRegex": "\\b(reserve|book now|confirm booking|complete booking|checkout|purchase|pay|cancel reservation)\\b",
+    "allowedActionTextRegexes": []
+  },
+  "bayClub": {
+    "clubName": "Santa Clara",
+    "bookingUrl": "https://bayclubconnect.com/racquet-sports/create-booking/3bc78448-ec6b-49e1-a2ae-64abd68e646b",
+    "timeZone": "America/Los_Angeles",
+    "durationMinutes": 60,
+    "daysOfWeek": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+    "singles": {
+      "enabled": true,
+      "windows": [
+        { "earliestTime": "17:00" }
+      ]
+    },
+    "ballMachine": {
+      "enabled": true,
+      "windows": [
+        { "earliestTime": "08:00", "latestTime": "08:00" },
+        { "earliestTime": "17:00" }
+      ]
+    }
+  },
+  "watches": []
+}
