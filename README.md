@@ -31,7 +31,7 @@ Bay Club login is normally a one-time setup, but the website can expire its sess
 
 When this runs locally, monitoring pauses when the Mac sleeps, shuts down, loses its network connection, or the monitor's Terminal window is closed. A free hosted deployment can avoid that; it needs the same authenticated Bay Club session and persistent private storage.
 
-For the prepared free GitHub Actions deployment, see `CLOUD-DEPLOYMENT.md`. The workflow and encrypted-session export command are included in this project.
+For the prepared free GitHub Actions deployment, see `CLOUD-DEPLOYMENT.md`. The five-minute monitor, monthly repository keepalive, and encrypted-session export command are included in this project.
 
 ## What an alert looks like
 

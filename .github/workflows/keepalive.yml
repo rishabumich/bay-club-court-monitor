@@ -1,0 +1,26 @@
+name: Keep scheduled monitor active
+
+on:
+  workflow_dispatch:
+  schedule:
+    # A real repository commit every month prevents GitHub's 60-day inactivity
+    # rule from disabling the five-minute court-monitor schedule.
+    - cron: "27 16 17 * *"
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record repository activity
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive
+          git commit -m "chore: keep scheduled monitor active"
+          git push

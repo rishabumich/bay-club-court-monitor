@@ -21,6 +21,7 @@ It writes the value to `data/browser-profile/storage-state.base64.txt`. That ent
 ## Workflow behavior
 
 - `.github/workflows/monitor.yml` checks every five minutes and also supports **Run workflow** from GitHub's Actions page.
+- `.github/workflows/keepalive.yml` makes one timestamp-only bot commit each month so GitHub's 60-day public-repository inactivity rule does not disable scheduled checks.
 - It restores and saves `data/state.json` through the Actions cache so continuously available hours do not repeatedly alert.
 - Bay Club session data exists only in an encrypted secret and an ephemeral job environment. It is never cached or committed.
 - The workflow uses `config.example.json`, which contains only non-secret Santa Clara search preferences.
@@ -38,4 +39,4 @@ Then replace the `BAYCLUB_STORAGE_STATE_B64` repository secret with the newly ex
 
 ## Free-tier caveats
 
-GitHub may delay scheduled workflows during heavy load. Public-repository schedules are disabled after 60 days with no repository activity, so visit the Actions page and re-enable the workflow if GitHub emails about inactivity.
+GitHub may delay scheduled workflows during heavy load. The monthly keepalive commit is included to prevent the normal 60-day inactivity shutdown; if GitHub ever disables Actions for another reason, it still requires manual re-enabling from the Actions page.
