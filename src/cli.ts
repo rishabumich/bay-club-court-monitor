@@ -5,7 +5,7 @@ import "dotenv/config";
 import { acquireRunLock } from "./browser.js";
 import { loadConfig } from "./config.js";
 import { exportCloudSession, inspectWatch, setupLogin } from "./inspect.js";
-import { runMonitorOnce } from "./monitor.js";
+import { runMonitorOnce, runTomorrowTest } from "./monitor.js";
 import { setupTelegram, testTelegram } from "./telegram-setup.js";
 
 const projectDir = path.resolve(import.meta.dirname, "..");
@@ -60,6 +60,15 @@ async function main(): Promise<void> {
       }
       return;
     }
+    case "test-tomorrow": {
+      const release = await acquireRunLock(projectDir);
+      try {
+        await runTomorrowTest(config, hasFlag("dry-run"));
+      } finally {
+        await release();
+      }
+      return;
+    }
     case "monitor": {
       const release = await acquireRunLock(projectDir);
       const shutdown = async () => {
@@ -82,7 +91,7 @@ async function main(): Promise<void> {
       }
     }
     default:
-      throw new Error("Usage: npm run setup:login | cloud:export-session | monitor:once -- --dry-run | monitor");
+      throw new Error("Usage: npm run setup:login | cloud:export-session | monitor:once -- --dry-run | test:tomorrow | monitor");
   }
 }
 

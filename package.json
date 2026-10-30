@@ -9,6 +9,7 @@
     "setup:telegram": "tsx src/cli.ts setup-telegram",
     "cloud:export-session": "tsx src/cli.ts export-cloud-session",
     "test:telegram": "tsx src/cli.ts test-telegram",
+    "test:tomorrow": "tsx src/cli.ts test-tomorrow",
     "inspect": "tsx src/cli.ts inspect",
     "monitor:once": "tsx src/cli.ts monitor-once",
     "monitor": "tsx src/cli.ts monitor",

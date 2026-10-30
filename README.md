@@ -56,12 +56,15 @@ npx playwright install chromium
 npm run setup:login
 npm run monitor:once -- --dry-run
 npm run monitor:once
+npm run test:tomorrow
 npm run monitor
 npm run typecheck
 npm test
 ```
 
 `--dry-run` prints the Telegram message without sending it. Private files are Git-ignored: `.env`, `config.json`, `data/`, and browser artifacts.
+
+`npm run test:tomorrow` is an immediate verification command. It ignores the normal evening preference for that run, scans every unlocked 60-minute Singles opening tomorrow, and sends the complete current list to Telegram without changing alert history.
 
 ## Safety boundaries
 

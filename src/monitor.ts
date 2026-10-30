@@ -3,7 +3,7 @@ import { scanBayClub } from "./bayclub.js";
 import { executeActions, withBrowser } from "./browser.js";
 import { extractSlots } from "./extract.js";
 import { matchesWatch } from "./match.js";
-import { sendNotification } from "./notify.js";
+import { sendNotification, sendTelegramMessage } from "./notify.js";
 import { loadState, markNotified, pruneState, reconcileSlots, saveState } from "./store.js";
 import type { AppConfig, Slot } from "./types.js";
 
@@ -52,4 +52,31 @@ export async function runMonitorOnce(config: AppConfig, projectDir: string, dryR
   }
   pruneState(state, now);
   await saveState(statePath, state);
+}
+
+export async function runTomorrowTest(config: AppConfig, dryRun: boolean): Promise<void> {
+  if (!config.bayClub) throw new Error("The tomorrow test requires the Bay Club preset.");
+
+  let slots: Slot[] = [];
+  await withBrowser(config, false, async (_context, page) => {
+    const [singles] = await scanBayClub(page, config, {
+      playerTypes: ["Singles"],
+      dateOffsets: [1],
+      includeAllHours: true
+    });
+    slots = singles?.slots ?? [];
+  });
+
+  console.log(`[${new Date().toISOString()}] Tomorrow test found ${slots.length} unlocked Singles hour(s).`);
+  if (slots.length) {
+    await sendNotification(slots, dryRun, slots.length);
+    return;
+  }
+
+  const message = `Bay Club ${config.bayClub.clubName} tomorrow test: no unlocked 60-minute Singles openings are currently available.`;
+  if (dryRun) {
+    console.log("\n[DRY RUN NOTIFICATION]\n" + message + "\n");
+  } else {
+    await sendTelegramMessage(message);
+  }
 }

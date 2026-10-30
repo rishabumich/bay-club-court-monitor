@@ -15,6 +15,12 @@ export interface ScanResult {
   slots: Slot[];
 }
 
+export interface BayClubScanOptions {
+  dateOffsets?: number[];
+  playerTypes?: Array<"Singles" | "Ball machine">;
+  includeAllHours?: boolean;
+}
+
 function timeToMinutes(value: string): number {
   const match = /^(\d{2}):(\d{2})$/.exec(value);
   if (!match) throw new Error(`Invalid time ${JSON.stringify(value)}`);
@@ -105,7 +111,8 @@ async function openHourView(
 async function scanPlayerType(
   page: Page,
   config: AppConfig,
-  playerType: "Singles" | "Ball machine"
+  playerType: "Singles" | "Ball machine",
+  options: BayClubScanOptions = {}
 ): Promise<ScanResult> {
   const preset = config.bayClub!;
   const isMachine = playerType === "Ball machine";
@@ -121,7 +128,11 @@ async function scanPlayerType(
 
   for (let index = 0; index < dateCount; index += 1) {
     const date = dateAtOffset(preset.timeZone, index);
-    if (!preset.daysOfWeek.includes(date.dayName)) continue;
+    if (options.dateOffsets) {
+      if (!options.dateOffsets.includes(index)) continue;
+    } else if (!preset.daysOfWeek.includes(date.dayName)) {
+      continue;
+    }
     // Bay Club renders Today as selected with `disabled no-events`. Other date
     // tiles can also sit behind the slider's overlay, so invoke their own click
     // handler and verify Angular marked the intended day selected before reading.
@@ -155,7 +166,7 @@ async function scanPlayerType(
     )];
     for (const rawHour of uniqueHours) {
       const parsed = parseBayClubHour(rawHour, preset.durationMinutes);
-      if (!parsed || !inWindows(parsed.startMinutes, search.windows)) continue;
+      if (!parsed || (!options.includeAllHours && !inWindows(parsed.startMinutes, search.windows))) continue;
       slots.push({
         watchId: id,
         watchName: name,
@@ -172,9 +183,15 @@ async function scanPlayerType(
   return { id, name, slots };
 }
 
-export async function scanBayClub(page: Page, config: AppConfig): Promise<ScanResult[]> {
-  return [
-    await scanPlayerType(page, config, "Singles"),
-    await scanPlayerType(page, config, "Ball machine")
-  ];
+export async function scanBayClub(
+  page: Page,
+  config: AppConfig,
+  options: BayClubScanOptions = {}
+): Promise<ScanResult[]> {
+  const playerTypes = options.playerTypes ?? ["Singles", "Ball machine"];
+  const results: ScanResult[] = [];
+  for (const playerType of playerTypes) {
+    results.push(await scanPlayerType(page, config, playerType, options));
+  }
+  return results;
 }

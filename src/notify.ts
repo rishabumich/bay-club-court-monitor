@@ -25,7 +25,7 @@ function loadTwilioEnv(): TwilioEnv {
   return values as TwilioEnv;
 }
 
-export function buildMessage(slots: Slot[]): string {
+export function buildMessage(slots: Slot[], maxSlots = 12): string {
   const first = slots[0];
   if (!first) throw new Error("Cannot build a notification with no slots.");
   const groups = new Map<string, Slot[]>();
@@ -36,10 +36,10 @@ export function buildMessage(slots: Slot[]): string {
   const lines: string[] = [];
   let shown = 0;
   for (const group of groups.values()) {
-    if (shown >= 12) break;
+    if (shown >= maxSlots) break;
     const representative = group[0]!;
     const date = representative.date ? formatDate(representative.date) : "Available";
-    const times = group.slice(0, Math.max(1, 12 - shown)).map((slot) => slot.time ?? describeSlot(slot));
+    const times = group.slice(0, Math.max(1, maxSlots - shown)).map((slot) => slot.time ?? describeSlot(slot));
     lines.push(`• ${representative.watchName} — ${date}: ${times.join(", ")}`);
     shown += times.length;
   }
@@ -102,8 +102,8 @@ async function sendTwilioSms(body: string): Promise<void> {
   }
 }
 
-export async function sendNotification(slots: Slot[], dryRun: boolean): Promise<void> {
-  const body = buildMessage(slots);
+export async function sendNotification(slots: Slot[], dryRun: boolean, maxSlots = 12): Promise<void> {
+  const body = buildMessage(slots, maxSlots);
   if (dryRun) {
     console.log("\n[DRY RUN NOTIFICATION]\n" + body + "\n");
     return;
